@@ -2,7 +2,7 @@
 
 中文 | [English](README.en.md)
 
-MCP（Model Context Protocol）服务器：为**不支持图片输入**的主模型提供看图能力。
+给 **DeepSeek 等纯文本模型** 用的识图 MCP 服务器：让不支持图片输入的 LLM 也能看图。
 
 主模型调用 `describe_image` 工具并传入图片（本地路径或 http(s) URL），
 服务器将图片转为 base64 data URL，交给支持图像输入的商汤多模态模型

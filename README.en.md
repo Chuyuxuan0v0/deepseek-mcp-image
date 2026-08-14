@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-An MCP (Model Context Protocol) server that gives **vision capability to text-only LLMs**.
+A vision MCP server **built for DeepSeek and other text-only LLMs** — giving models without image input the ability to see.
 
 The host model calls the `describe_image` tool with an image (local path or http(s) URL); the server converts it to a base64 data URL and sends it to the SenseNova multimodal model **6.8 Flash-Lite** (`sensenova-6.8-flash-lite`) for recognition, returning a text description.
 
