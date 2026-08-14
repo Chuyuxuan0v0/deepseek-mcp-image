@@ -1,5 +1,7 @@
 # deepseek-mcp-image
 
+中文 | [English](README.en.md)
+
 MCP（Model Context Protocol）服务器：为**不支持图片输入**的主模型提供看图能力。
 
 主模型调用 `describe_image` 工具并传入图片（本地路径或 http(s) URL），
