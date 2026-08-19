@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import http from 'node:http'
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
@@ -6,6 +7,7 @@ import { loadDotEnv } from './src/env.js'
 import { getImageHostConfig } from './src/minitools.js'
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url))
+loadDotEnv(path.join(process.cwd(), '.env'))
 loadDotEnv(path.join(ROOT, '.env'))
 
 const cfg = getImageHostConfig()

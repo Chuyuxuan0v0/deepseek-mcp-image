@@ -41,6 +41,16 @@ flowchart TD
 
 ## 安装
 
+推荐用 npm / npx，无需 clone：
+
+```bash
+npm install -g deepseek-mcp-image
+```
+
+或每次由 MCP 客户端自动拉取：`npx -y deepseek-mcp-image`。
+
+开发者仍可从源码安装：
+
 ```bash
 git clone https://github.com/Chuyuxuan0v0/deepseek-mcp-image.git
 cd deepseek-mcp-image
@@ -88,7 +98,7 @@ Authorization=Bearer mtu_live_你的图床key
 | `MINI_TOOLS_DURATION` | — | `1-day` | 图床保留期：`1-day` / `7-day` / `30-day` / `permanent` |
 | `MAX_IMAGE_BYTES` | — | `20971520`（20MB） | 远程 URL 单张大小上限；图床上传另有 5MB 限制 |
 
-也可复制 `.env.example` 为项目根目录的 `.env`（已被 git 忽略）。服务器启动时会自动读取，MCP 客户端传入的 `env` 优先。
+也可复制 `.env.example` 为当前工作目录的 `.env`（已被 git 忽略）。服务器会先读工作目录的 `.env`，再读安装目录里的 `.env`；**MCP 客户端传入的 `env` 优先**。用 npx 时请把密钥写在客户端配置里，不要依赖仓库里的 `.env`。
 
 图床凭证**仅供个人使用**，不要写进代码、不要提交仓库、不要公开。
 
@@ -111,8 +121,10 @@ npm test
 图床 API 不允许浏览器从本地 HTML 直接跨域调用，所以仓库提供了本机相册页：由 `gallery-server.mjs` 读取 `.env`，再去拉 [用量](https://mini-tools.uk/image-api?lang=zh-CN) 和仍有效的图片列表。
 
 ```bash
-npm run gallery
+npx deepseek-mcp-image-gallery
 ```
+
+或在源码目录：`npm run gallery`。
 
 浏览器打开 [http://127.0.0.1:3780](http://127.0.0.1:3780)（不要双击 `gallery.html`）。效果如下：
 
@@ -129,18 +141,14 @@ npm run gallery
 
 ## 接入 MCP 客户端
 
-标准 stdio MCP 服务器，启动命令：`node <本仓库路径>/src/index.js`。
-
-### Claude Desktop
-
-`claude_desktop_config.json` 示例：
+标准 stdio MCP 服务器。推荐用 npx，不必写本机路径：
 
 ```json
 {
   "mcpServers": {
     "deepseek-mcp-image": {
-      "command": "node",
-      "args": ["<本仓库路径>/src/index.js"],
+      "command": "npx",
+      "args": ["-y", "deepseek-mcp-image"],
       "env": {
         "SENSENOVA_API_KEY": "sk-你的key",
         "MINI_TOOLS_USER_ID": "你的图床用户ID",
@@ -150,6 +158,10 @@ npm run gallery
   }
 }
 ```
+
+已全局安装时，也可 `"command": "deepseek-mcp-image"`（Windows 上 npm 会生成 `.cmd`）。从源码调试则用：`node <本仓库路径>/src/index.js`。
+
+Claude Desktop 把上面这段写入 `claude_desktop_config.json`；Cursor 写入 MCP 设置即可。
 
 ### DeepSeek Harness（dsh）
 
@@ -162,8 +174,8 @@ npm run gallery
       config:
         serverName: vision
         transport: stdio
-        command: node
-        args: ['<本仓库路径>/src/index.js']
+        command: npx
+        args: ['-y', 'deepseek-mcp-image']
         env:
           SENSENOVA_API_KEY: !!js process.env.SENSENOVA_API_KEY ?? ''
           MINI_TOOLS_USER_ID: !!js process.env.MINI_TOOLS_USER_ID ?? ''

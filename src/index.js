@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
@@ -10,6 +11,7 @@ import { buildSystemPrompt } from './prompt.js'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 if (process.env.MINI_TOOLS_SKIP_DOTENV !== '1') {
+  loadDotEnv(path.join(process.cwd(), '.env'))
   loadDotEnv(path.join(root, '.env'))
 }
 

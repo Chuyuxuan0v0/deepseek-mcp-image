@@ -4,10 +4,25 @@
   "description": "MCP server that reads images via SenseNova 6.8 Flash-Lite multimodal model",
   "type": "module",
   "main": "src/index.js",
+  "bin": {
+    "deepseek-mcp-image": "src/index.js",
+    "deepseek-mcp-image-gallery": "gallery-server.mjs"
+  },
+  "files": [
+    "src",
+    "gallery-server.mjs",
+    "gallery.html",
+    "imgs",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    ".env.example"
+  ],
   "scripts": {
     "start": "node src/index.js",
     "gallery": "node gallery-server.mjs",
-    "test": "node --test test/*.js"
+    "test": "node --test test/*.js",
+    "prepublishOnly": "npm test"
   },
   "engines": {
     "node": ">=18"

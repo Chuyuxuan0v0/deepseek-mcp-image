@@ -38,6 +38,16 @@ flowchart TD
 
 ## Install
 
+Install from npm (no clone needed):
+
+```bash
+npm install -g deepseek-mcp-image
+```
+
+Or let the MCP client fetch it: `npx -y deepseek-mcp-image`.
+
+From source:
+
 ```bash
 git clone https://github.com/Chuyuxuan0v0/deepseek-mcp-image.git
 cd deepseek-mcp-image
@@ -85,7 +95,7 @@ Authorization=Bearer mtu_live_your_key
 | `MINI_TOOLS_DURATION` | — | `1-day` | Retention: `1-day` / `7-day` / `30-day` / `permanent` |
 | `MAX_IMAGE_BYTES` | — | `20971520` (20MB) | Max size for remote URLs; uploads to the image host are capped at 5MB |
 
-You can copy `.env.example` to `.env` in the repo root (gitignored). The server loads it on startup; MCP client `env` values take precedence.
+You can copy `.env.example` to `.env` in the current working directory (gitignored). The server loads `.env` from the cwd first, then from the install directory. MCP client `env` values take precedence. With npx, put secrets in the client config rather than relying on a repo `.env`.
 
 Image-host credentials are **for personal use only**. Do not hardcode them, commit them, or share them.
 
@@ -108,8 +118,10 @@ npm test
 The image-host API does not allow a local HTML file to call it from the browser (CORS). This repo includes a local gallery: `gallery-server.mjs` reads `.env` and fetches [usage](https://mini-tools.uk/image-api) plus the list of still-valid images.
 
 ```bash
-npm run gallery
+npx deepseek-mcp-image-gallery
 ```
+
+Or from a clone: `npm run gallery`.
 
 Open [http://127.0.0.1:3780](http://127.0.0.1:3780) (do not double-click `gallery.html`). It looks like this:
 
@@ -126,18 +138,14 @@ Stop the helper with `Ctrl+C`. Override the port with `GALLERY_PORT`.
 
 ## Connect to MCP Clients
 
-Standard stdio MCP server; start command: `node <repo-path>/src/index.js`.
-
-### Claude Desktop
-
-Example `claude_desktop_config.json`:
+Standard stdio MCP server. Prefer npx so you do not hardcode a local path:
 
 ```json
 {
   "mcpServers": {
     "deepseek-mcp-image": {
-      "command": "node",
-      "args": ["<repo-path>/src/index.js"],
+      "command": "npx",
+      "args": ["-y", "deepseek-mcp-image"],
       "env": {
         "SENSENOVA_API_KEY": "sk-your-key",
         "MINI_TOOLS_USER_ID": "your-image-host-user-id",
@@ -147,6 +155,10 @@ Example `claude_desktop_config.json`:
   }
 }
 ```
+
+If installed globally, `"command": "deepseek-mcp-image"` also works. For source debugging: `node <repo-path>/src/index.js`.
+
+Paste the same block into Claude Desktop's `claude_desktop_config.json` or Cursor MCP settings.
 
 ### DeepSeek Harness (dsh)
 
@@ -159,8 +171,8 @@ Append an entry to your profile patch layer (e.g. `~/.dsh/profiles/web/cordis.pa
       config:
         serverName: vision
         transport: stdio
-        command: node
-        args: ['<repo-path>/src/index.js']
+        command: npx
+        args: ['-y', 'deepseek-mcp-image']
         env:
           SENSENOVA_API_KEY: !!js process.env.SENSENOVA_API_KEY ?? ''
           MINI_TOOLS_USER_ID: !!js process.env.MINI_TOOLS_USER_ID ?? ''
