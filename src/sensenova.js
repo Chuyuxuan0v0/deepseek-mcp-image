@@ -2,13 +2,10 @@ export const DEFAULT_BASE_URL = 'https://token.sensenova.cn/v1'
 export const MODEL = 'sensenova-6.8-flash-lite'
 
 /** 生成含 image_url 的 user 消息（商汤多模态输入格式） */
-export function buildImageMessage(question, dataUrl) {
+export function buildImageMessage(imageUrl) {
   return {
     role: 'user',
-    content: [
-      { type: 'text', text: question },
-      { type: 'image_url', image_url: { url: dataUrl } },
-    ],
+    content: [{ type: 'image_url', image_url: { url: imageUrl } }],
   }
 }
 
@@ -17,7 +14,7 @@ export function buildImageMessage(question, dataUrl) {
  * @param {{ apiKey: string, baseUrl?: string, messages: object[], maxTokens?: number, fetchImpl?: typeof fetch }} opts
  * @returns {Promise<{ content: string, finishReason: string }>}
  */
-export async function callChat({ apiKey, baseUrl = DEFAULT_BASE_URL, messages, maxTokens = 1000, fetchImpl = fetch }) {
+export async function callChat({ apiKey, baseUrl = DEFAULT_BASE_URL, messages, maxTokens = 2000, fetchImpl = fetch }) {
   if (!apiKey) {
     throw new Error('缺少 SENSENOVA_API_KEY，请设置环境变量后重试')
   }
@@ -35,7 +32,8 @@ export async function callChat({ apiKey, baseUrl = DEFAULT_BASE_URL, messages, m
 
   let res
   try {
-    res = await fetchImpl(`${baseUrl}/chat/completions`, {
+    const endpoint = `${baseUrl || DEFAULT_BASE_URL}`.replace(/\/+$/, '')
+    res = await fetchImpl(`${endpoint}/chat/completions`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,

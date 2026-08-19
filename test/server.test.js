@@ -61,3 +61,17 @@ test('本地 PNG 转换成功、进入 API 层，缺 key 时报"设置 SENSENOVA
     await client.close()
   }
 })
+
+test('有 question 时工具调用链路正常，缺 key 走 API 层报错', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mcpimg-'))
+  const img = path.join(dir, 'a.png')
+  await fs.writeFile(img, PNG_1PX)
+  const client = await startServer({ SENSENOVA_API_KEY: '' })
+  try {
+    const r = await client.callTool({ name: 'describe_image', arguments: { image: img, question: '这段代码有什么问题' } })
+    assert.equal(r.isError, true)
+    assert.match(textOf(r), /SENSENOVA_API_KEY/)
+  } finally {
+    await client.close()
+  }
+})

@@ -92,10 +92,18 @@ Reasonix / Cursor / 通用 MCP 客户端按各自 stdio 服务器配置方式接
 | 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
 | `image` | string | ✅ | — | 本地文件路径（绝对/相对）或 `http(s)://` URL |
-| `question` | string | — | `请详细描述这张图片的内容` | 要问图片的问题 |
-| `max_tokens` | integer | — | `1000` | 最大生成 token 数，上限 4096 |
+| `question` | string | — | — | 要问图片的问题。省略时只做文字提取与视觉描述，不生成 Answer 分区。 |
+| `max_tokens` | integer | — | `2000` | 最大生成 token 数，上限 8192 |
 
 支持的图片格式：PNG / JPEG / GIF / WebP / BMP / SVG。
+
+### 输出格式
+
+模型按以下分区返回结果（识图提示词参考 [Vizards/deepseek-v4-for-copilot#206](https://github.com/Vizards/deepseek-v4-for-copilot/pull/206)）：
+
+- `--- Extracted Text ---`：图片中所有文字/符号的逐字转录（代码块、表格等保留格式）
+- `--- Visual Context ---`：非文字视觉内容的描述（纯文字截图可能省略此区）
+- `--- Answer ---`：仅当传入 `question` 时出现，为对该问题的回答
 
 ## 手动验收
 

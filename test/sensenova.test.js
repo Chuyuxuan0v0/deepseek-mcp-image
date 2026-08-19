@@ -5,12 +5,11 @@ import { callChat, buildImageMessage, MODEL } from '../src/sensenova.js'
 const DATA_URL = 'data:image/png;base64,iVBORw0KGgo='
 
 test('buildImageMessage 生成含 image_url 的 user 消息', () => {
-  const msg = buildImageMessage('图片里面有什么', DATA_URL)
+  const msg = buildImageMessage(DATA_URL)
   assert.equal(msg.role, 'user')
-  assert.equal(msg.content[0].type, 'text')
-  assert.equal(msg.content[0].text, '图片里面有什么')
-  assert.equal(msg.content[1].type, 'image_url')
-  assert.equal(msg.content[1].image_url.url, DATA_URL)
+  assert.equal(msg.content.length, 1)
+  assert.equal(msg.content[0].type, 'image_url')
+  assert.equal(msg.content[0].image_url.url, DATA_URL)
 })
 
 test('callChat 请求体符合商汤规范并解析响应', async () => {
@@ -28,7 +27,7 @@ test('callChat 请求体符合商汤规范并解析响应', async () => {
     }
   }
   const { content, finishReason } = await callChat({
-    apiKey: 'sk-test', messages: [buildImageMessage('图片里面有什么', DATA_URL)], maxTokens: 500, fetchImpl,
+    apiKey: 'sk-test', messages: [buildImageMessage(DATA_URL)], maxTokens: 500, fetchImpl,
   })
   assert.equal(content, '图片里有一只猫')
   assert.equal(finishReason, 'stop')
@@ -42,7 +41,7 @@ test('callChat 请求体符合商汤规范并解析响应', async () => {
   assert.equal(captured.body.temperature, 0.6)
   assert.equal(captured.body.top_p, 0.95)
   assert.equal(captured.body.max_tokens, 500)
-  assert.equal(captured.body.messages[0].content[1].image_url.url, DATA_URL)
+  assert.equal(captured.body.messages[0].content[0].image_url.url, DATA_URL)
 })
 
 test('content_filter 返回合规拦截提示', async () => {

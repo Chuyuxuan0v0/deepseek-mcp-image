@@ -90,10 +90,18 @@ Reasonix / Cursor / any MCP client: configure it as a stdio server.
 | Param | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `image` | string | ✅ | — | Local file path (absolute/relative) or `http(s)://` URL |
-| `question` | string | — | `请详细描述这张图片的内容` | Question to ask about the image |
-| `max_tokens` | integer | — | `1000` | Max output tokens, up to 4096 |
+| `question` | string | — | — | Question to ask about the image. When omitted, only extracts text and describes the image; no Answer section is produced. |
+| `max_tokens` | integer | — | `2000` | Max output tokens, up to 8192 |
 
 Supported formats: PNG / JPEG / GIF / WebP / BMP / SVG.
+
+### Output Format
+
+The model returns results in these sections (vision prompt adapted from [Vizards/deepseek-v4-for-copilot#206](https://github.com/Vizards/deepseek-v4-for-copilot/pull/206)):
+
+- `--- Extracted Text ---`: verbatim transcription of all text/symbols in the image (code blocks, tables, etc. preserve formatting)
+- `--- Visual Context ---`: description of non-text visual content (may be omitted for text-only screenshots)
+- `--- Answer ---`: only present when a `question` is passed, the answer to that question
 
 ## Manual Acceptance
 
