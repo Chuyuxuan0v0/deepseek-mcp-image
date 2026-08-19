@@ -1,6 +1,6 @@
 {
   "name": "deepseek-mcp-image",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server that reads images via SenseNova 6.8 Flash-Lite multimodal model",
   "type": "module",
   "main": "src/index.js",

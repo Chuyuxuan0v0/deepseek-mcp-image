@@ -19,7 +19,7 @@ const maxBytesEnv = process.env.MAX_IMAGE_BYTES
 const maxBytesValue = Number(maxBytesEnv)
 const maxBytes = Number.isSafeInteger(maxBytesValue) && maxBytesValue > 0 ? maxBytesValue : undefined
 
-const server = new McpServer({ name: 'deepseek-mcp-image', version: '0.1.0' })
+const server = new McpServer({ name: 'deepseek-mcp-image', version: '0.1.1' })
 
 server.registerTool(
   'describe_image',
