@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>图床相册 · Mini Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #14160f;
+      --panel: #1e2218;
+      --line: #3a4030;
+      --brass: #c6a15b;
+      --paper: #ece6d6;
+      --muted: #9aa18a;
+      --danger: #d36b56;
+      --ok: #7d9a6a;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--paper); }
+    body {
+      font-family: "Noto Sans SC", "IBM Plex Mono", sans-serif;
+      padding: 28px 22px 64px;
+    }
+    header {
+      display: grid;
+      gap: 14px;
+      margin: 0 auto 28px;
+      max-width: 1180px;
+    }
+    .eyebrow {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--brass);
+    }
+    h1 {
+      font-family: Syne, "Noto Sans SC", sans-serif;
+      font-weight: 800;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.05;
+      margin: 0;
+    }
+    .sub { color: var(--muted); font-size: 14px; max-width: 52ch; }
+    .meter {
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+    .meter-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+    }
+    .meter-top strong { color: var(--brass); font-weight: 500; }
+    .track {
+      height: 8px;
+      background: #10120c;
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--ok), var(--brass));
+      transition: width .4s ease;
+    }
+    .status {
+      min-height: 1.4em;
+      color: var(--danger);
+      font-size: 13px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+    }
+    .frame {
+      aspect-ratio: 4 / 3;
+      background: #0c0d0a;
+      cursor: zoom-in;
+      overflow: hidden;
+    }
+    .frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .meta {
+      padding: 10px 12px 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .key {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      color: var(--brass);
+      word-break: break-all;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .actions { display: flex; gap: 8px; }
+    button {
+      font-family: inherit;
+      font-size: 12px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--paper);
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--brass); color: var(--brass); }
+    button.danger:hover { border-color: var(--danger); color: var(--danger); }
+    .more-wrap {
+      max-width: 1180px;
+      margin: 22px auto 0;
+    }
+    #more { display: none; width: 100%; padding: 12px; }
+    .empty {
+      max-width: 1180px;
+      margin: 40px auto;
+      color: var(--muted);
+    }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 9, 6, .92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      cursor: zoom-out;
+      z-index: 9;
+    }
+    .lightbox.show { display: flex; }
+    .lightbox img { max-width: min(92vw, 1400px); max-height: 90vh; }
+    @media (prefers-reduced-motion: reduce) {
+      .fill { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Mini Tools · current account</div>
+    <h1>图床相册</h1>
+    <p class="sub">列出当前 API 账号仍有效的图片。凭证只由本机 <code>npm run gallery</code> 读取 <code>.env</code>，不会出现在页面里。接口文档见 <a href="https://mini-tools.uk/image-api?lang=zh-CN" style="color:var(--brass)">Mini Tools Image API</a>。</p>
+    <div class="meter">
+      <div class="meter-top">
+        <span>FRAME COUNTER</span>
+        <strong id="counter">— / —</strong>
+      </div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="row">
+        <span id="reset">额度按 Asia/Shanghai 零点重置</span>
+        <span id="plan"></span>
+      </div>
+    </div>
+    <div class="status" id="status"></div>
+  </header>
+
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>这个账号还没有仍有效的图片。用 MCP 上传本地图后会出现在这里。</p>
+  <div class="more-wrap"><button id="more">加载更多</button></div>
+  <div class="lightbox" id="lightbox"><img alt="" /></div>
+
+  <script>
+    const grid = document.getElementById('grid')
+    const empty = document.getElementById('empty')
+    const more = document.getElementById('more')
+    const status = document.getElementById('status')
+    const lightbox = document.getElementById('lightbox')
+    let cursor = null
+
+    function fmtSize(n) {
+      if (!Number.isFinite(n)) return '—'
+      if (n < 1024) return n + ' B'
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB'
+      return (n / 1024 / 1024).toFixed(2) + ' MB'
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return '—'
+      const d = new Date(iso)
+      if (Number.isNaN(d.getTime())) return iso
+      return d.toLocaleString('zh-CN', { hour12: false })
+    }
+
+    async function api(path, options) {
+      const res = await fetch(path, options)
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || data.message || `HTTP ${res.status}`)
+      return data
+    }
+
+    function card(record) {
+      const el = document.createElement('article')
+      el.className = 'card'
+      el.innerHTML = `
+        <div class="frame"><img alt="" loading="lazy" /></div>
+        <div class="meta">
+          <div class="key"></div>
+          <div class="row"><span class="mime"></span><span class="size"></span></div>
+          <div class="row"><span class="time"></span></div>
+          <div class="actions">
+            <button type="button" class="copy">复制链接</button>
+            <button type="button" class="open">新窗口</button>
+            <button type="button" class="danger delete">删除</button>
+          </div>
+        </div>`
+      const img = el.querySelector('img')
+      img.src = record.url
+      img.alt = record.key || 'image'
+      el.querySelector('.key').textContent = record.key || ''
+      el.querySelector('.mime').textContent = record.mime || ''
+      el.querySelector('.size').textContent = fmtSize(record.size)
+      el.querySelector('.time').textContent = fmtTime(record.uploaded_at)
+      el.querySelector('.frame').addEventListener('click', () => {
+        lightbox.querySelector('img').src = record.url
+        lightbox.classList.add('show')
+      })
+      el.querySelector('.copy').addEventListener('click', async () => {
+        await navigator.clipboard.writeText(record.url)
+        status.textContent = '已复制公开 URL'
+        status.style.color = 'var(--ok)'
+      })
+      el.querySelector('.open').addEventListener('click', () => window.open(record.url, '_blank', 'noopener'))
+      el.querySelector('.delete').addEventListener('click', async () => {
+        if (!confirm(`删除 ${record.key}？删除不会返还额度。`)) return
+        try {
+          await api('/api/images?key=' + encodeURIComponent(record.key), { method: 'DELETE' })
+          el.remove()
+          if (!grid.children.length && !cursor) empty.hidden = false
+        } catch (e) {
+          status.style.color = 'var(--danger)'
+          status.textContent = e.message
+        }
+      })
+      return el
+    }
+
+    async function loadUsage() {
+      const data = await api('/api/usage')
+      const tmp = data.usage?.temporary
+      if (tmp) {
+        document.getElementById('counter').textContent = `${tmp.used ?? 0} / ${tmp.limit ?? 0}`
+        const pct = tmp.limit ? Math.min(100, (tmp.used / tmp.limit) * 100) : 0
+        document.getElementById('fill').style.width = pct + '%'
+        if (tmp.reset_at) {
+          document.getElementById('reset').textContent = '下次重置 ' + fmtTime(tmp.reset_at)
+        }
+      }
+      document.getElementById('plan').textContent = data.usage?.plan_type || ''
+    }
+
+    async function loadImages(reset) {
+      if (reset) {
+        grid.innerHTML = ''
+        cursor = null
+      }
+      const qs = new URLSearchParams({ limit: '20' })
+      if (cursor) qs.set('cursor', cursor)
+      const data = await api('/api/images?' + qs)
+      const records = data.records || []
+      for (const rec of records) grid.appendChild(card(rec))
+      cursor = data.next_cursor || null
+      more.style.display = cursor ? 'block' : 'none'
+      empty.hidden = grid.children.length > 0
+    }
+
+    lightbox.addEventListener('click', () => lightbox.classList.remove('show'))
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') lightbox.classList.remove('show')
+    })
+    more.addEventListener('click', () => loadImages(false).catch((e) => {
+      status.style.color = 'var(--danger)'
+      status.textContent = e.message
+    }))
+
+    if (location.protocol === 'file:') {
+      status.textContent = '请运行 npm run gallery，不要直接打开这个 HTML 文件。图床 API 不允许本地页面跨域。'
+    } else {
+      Promise.all([loadUsage(), loadImages(true)]).catch((e) => {
+        status.style.color = 'var(--danger)'
+        status.textContent = e.message
+      })
+    }
+  </script>
+</body>
+</html>

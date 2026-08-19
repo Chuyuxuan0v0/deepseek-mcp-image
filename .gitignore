@@ -1,2 +1,84 @@
-node_modules/
+.DS_Store
+node_modules
+/dist
+dist.zip
+docker/dist
+
+# Git worktrees (local isolated workspaces)
+.worktrees/
+
+
+# AI / agent tooling
+.agents
+.claude
+.cursor
+.codex
+.continue
+.gemini
+.mcp
+.opencode
+.reasonix
+.roo
+.trae
+.windsurf
+.aider*
+.augment
+.amazonq
+.cline
+.factory
+.sourcegraph
+.zed
+.github/skills
+.kimi-code
+
+
+
+# AI-generated docs / plans
+docs/superpowers/
+docs/openspecs/
+.superpowers/
+CLAUDE.local.md
+AGENTS.local.md
+.cursorrules.local
+reasonix.toml
+
+
+
+# local env files
 .env
+.env.local
+.env.*.local
+proxy.local.json
+proxy.config.json
+
+# Log files
+log/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+# cursor review
+final_review_gate.py
+.claude/settings.local.json
+
+
+### test
+*-aitest*
+_*.mjs
+auto-imports.d.ts
+**/__tests__/**
+
+
+# runtime log
+dev-server.log

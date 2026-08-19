@@ -6,7 +6,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node --test"
+    "gallery": "node gallery-server.mjs",
+    "test": "node --test test/*.js"
   },
   "engines": {
     "node": ">=18"
